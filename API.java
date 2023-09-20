@@ -22,6 +22,7 @@ public class APIClientApp extends Application {
 
         // Create a VBox layout to hold the label
         VBox vbox = new VBox(responseLabel);
+        string ss="test";
 
         // Create a scene
         Scene scene = new Scene(vbox, 300, 200);
