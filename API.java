@@ -19,7 +19,7 @@ public class APIClientApp extends Application {
 
         // Create a label to display the API response
         Label responseLabel = new Label("API Response Will Appear Here");
-
+        String Sai="Test";
         // Create a VBox layout to hold the label
         VBox vbox = new VBox(responseLabel);
       
