@@ -1,111 +1,71 @@
 using System;
 using System.Collections.Generic;
 
-class LeaveRequest
+class Employee
 {
+    public string EmployeeId { get; set; }
     public string EmployeeName { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public bool Approved { get; set; }
+    public Dictionary<DateTime, bool> Attendance { get; set; }
 
-    public LeaveRequest(string employeeName, DateTime startDate, DateTime endDate)
+    public Employee(string employeeId, string employeeName)
     {
+        EmployeeId = employeeId;
         EmployeeName = employeeName;
-        StartDate = startDate;
-        EndDate = endDate;
-        Approved = false;
-    }
-
-    public void Approve()
-    {
-        Approved = true;
-    }
-
-    public override string ToString()
-    {
-        return $"Employee: {EmployeeName}, Start Date: {StartDate.ToShortDateString()}, End Date: {EndDate.ToShortDateString()}, Approved: {Approved}";
+        Attendance = new Dictionary<DateTime, bool>();
     }
 }
 
-class LeaveApplicationSystem
+class AttendanceSystem
 {
-    private List<LeaveRequest> leaveRequests = new List<LeaveRequest>();
+    private List<Employee> employees = new List<Employee>();
 
-    public void RequestLeave()
+    public void AddEmployee(string employeeId, string employeeName)
     {
-        Console.WriteLine("Leave Application");
-        Console.Write("Enter your name: ");
-        string employeeName = Console.ReadLine();
-        Console.Write("Enter start date (yyyy-mm-dd): ");
-        DateTime startDate = DateTime.Parse(Console.ReadLine());
-        Console.Write("Enter end date (yyyy-mm-dd): ");
-        DateTime endDate = DateTime.Parse(Console.ReadLine());
-
-        LeaveRequest request = new LeaveRequest(employeeName, startDate, endDate);
-        leaveRequests.Add(request);
-        Console.WriteLine("Leave request submitted.");
+        Employee employee = new Employee(employeeId, employeeName);
+        employees.Add(employee);
     }
 
-    public void ProcessLeaveRequests()
+    public void MarkAttendance(string employeeId, DateTime date)
     {
-        Console.WriteLine("Leave Requests");
-        for (int i = 0; i < leaveRequests.Count; i++)
-        {
-            Console.WriteLine($"{i + 1}. {leaveRequests[i]}");
-        }
+        Employee employee = employees.Find(emp => emp.EmployeeId == employeeId);
 
-        Console.Write("Enter the number of the request to approve (0 to exit): ");
-        if (int.TryParse(Console.ReadLine(), out int choice))
+        if (employee != null)
         {
-            if (choice >= 1 && choice <= leaveRequests.Count)
+            if (!employee.Attendance.ContainsKey(date))
             {
-                LeaveRequest request = leaveRequests[choice - 1];
-                request.Approve();
-                Console.WriteLine("Leave request approved.");
+                employee.Attendance[date] = true;
+                Console.WriteLine($"{employee.EmployeeName} (ID: {employee.EmployeeId}) marked present on {date.ToShortDateString()}");
             }
-            else if (choice != 0)
+            else
             {
-                Console.WriteLine("Invalid choice.");
+                Console.WriteLine($"{employee.EmployeeName} (ID: {employee.EmployeeId}) has already been marked present on {date.ToShortDateString()}");
             }
         }
         else
         {
-            Console.WriteLine("Invalid input. Please enter a number.");
+            Console.WriteLine($"Employee with ID {employeeId} not found.");
         }
     }
 
-    public void Run()
+    public void ViewAttendance(string employeeId, DateTime startDate, DateTime endDate)
     {
-        while (true)
-        {
-            Console.WriteLine("\nLeave Application System");
-            Console.WriteLine("1. Request Leave");
-            Console.WriteLine("2. Process Leave Requests");
-            Console.WriteLine("3. Exit");
-            Console.Write("Enter your choice: ");
+        Employee employee = employees.Find(emp => emp.EmployeeId == employeeId);
 
-            if (int.TryParse(Console.ReadLine(), out int choice))
+        if (employee != null)
+        {
+            Console.WriteLine($"Attendance for {employee.EmployeeName} (ID: {employee.EmployeeId}) from {startDate.ToShortDateString()} to {endDate.ToShortDateString()}:");
+            foreach (var entry in employee.Attendance)
             {
-                switch (choice)
+                if (entry.Key >= startDate && entry.Key <= endDate)
                 {
-                    case 1:
-                        RequestLeave();
-                        break;
-                    case 2:
-                        ProcessLeaveRequests();
-                        break;
-                    case 3:
-                        Console.WriteLine("Exiting the application.");
-                        return;
-                    default:
-                        Console.WriteLine("Invalid choice. Please try again.");
-                        break;
+                    string status = entry.Value ? "Present" : "Absent";
+                    Console.WriteLine($"{entry.Key.ToShortDateString()}: {status}");
                 }
             }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter a number.");
-            }
+        }
+        else
+        {
+            Console.WriteLine($"Employee with ID {employeeId} not found.");
         }
     }
 }
@@ -114,7 +74,46 @@ class Program
 {
     static void Main()
     {
-        LeaveApplicationSystem leaveSystem = new LeaveApplicationSystem();
-        leaveSystem.Run();
+        AttendanceSystem attendanceSystem = new AttendanceSystem();
+
+        // Add employees
+        attendanceSystem.AddEmployee("001", "John Doe");
+        attendanceSystem.AddEmployee("002", "Jane Smith");
+
+        while (true)
+        {
+            Console.WriteLine("\nEmployee Attendance System");
+            Console.WriteLine("1. Mark Attendance");
+            Console.WriteLine("2. View Attendance");
+            Console.WriteLine("3. Exit");
+            Console.Write("Enter your choice: ");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Enter Employee ID: ");
+                    string empId = Console.ReadLine();
+                    Console.Write("Enter Date (yyyy-mm-dd): ");
+                    DateTime date = DateTime.Parse(Console.ReadLine());
+                    attendanceSystem.MarkAttendance(empId, date);
+                    break;
+                case "2":
+                    Console.Write("Enter Employee ID: ");
+                    string empIdToView = Console.ReadLine();
+                    Console.Write("Enter Start Date (yyyy-mm-dd): ");
+                    DateTime startDate = DateTime.Parse(Console.ReadLine());
+                    Console.Write("Enter End Date (yyyy-mm-dd): ");
+                    DateTime endDate = DateTime.Parse(Console.ReadLine());
+                    attendanceSystem.ViewAttendance(empIdToView, startDate, endDate);
+                    break;
+                case "3":
+                    Console.WriteLine("Exiting the application.");
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
+                    break;
+            }
+        }
     }
 }
