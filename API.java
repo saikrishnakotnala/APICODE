@@ -23,7 +23,7 @@ public class APIClientApp extends Application {
         // Create a VBox layout to hold the label
         VBox vbox = new VBox(responseLabel);
       
-        String Sai="";
+    
         // Create a scene
         Scene scene = new Scene(vbox, 300, 200);
 
