@@ -1,68 +1,76 @@
-class LeaveRequest:
-    def __init__(self, employee_name, start_date, end_date):
-        self.employee_name = employee_name
-        self.start_date = start_date
-        self.end_date = end_date
-        self.approved = False
+class Loan:
+    def __init__(self, customer_name, loan_amount, interest_rate, loan_term):
+        self.customer_name = customer_name
+        self.loan_amount = loan_amount
+        self.interest_rate = interest_rate
+        self.loan_term = loan_term
+        self.balance = loan_amount
+        self.payments = []
 
-    def approve(self):
-        self.approved = True
+    def make_payment(self, payment_amount):
+        if payment_amount <= self.balance:
+            self.balance -= payment_amount
+            self.payments.append(payment_amount)
+            print(f"Payment of ${payment_amount} made successfully.")
+        else:
+            print("Payment amount exceeds the outstanding balance.")
 
-    def __str__(self):
-        return f"Employee: {self.employee_name}, Start Date: {self.start_date}, End Date: {self.end_date}, Approved: {self.approved}"
+    def get_loan_summary(self):
+        total_paid = sum(self.payments)
+        return f"Customer: {self.customer_name}\n" \
+               f"Loan Amount: ${self.loan_amount}\n" \
+               f"Interest Rate: {self.interest_rate}%\n" \
+               f"Loan Term (months): {self.loan_term}\n" \
+               f"Outstanding Balance: ${self.balance}\n" \
+               f"Total Paid: ${total_paid}\n"
 
-class LeaveApplicationSystem:
-    def __init__(self):
-        self.leave_requests = []
 
-    def request_leave(self):
-        print("Leave Application")
-        employee_name = input("Enter your name: ")
-        start_date = input("Enter start date (yyyy-mm-dd): ")
-        end_date = input("Enter end date (yyyy-mm-dd): ")
+def main():
+    loans = []
 
-        request = LeaveRequest(employee_name, start_date, end_date)
-        self.leave_requests.append(request)
-        print("Leave request submitted.")
+    while True:
+        print("\nLoan Management Application")
+        print("1. Create Loan")
+        print("2. Make Payment")
+        print("3. Loan Summary")
+        print("4. Exit")
+        choice = input("Enter your choice: ")
 
-    def process_leave_requests(self):
-        print("Leave Requests")
-        for i, request in enumerate(self.leave_requests, start=1):
-            print(f"{i}. {request}")
-
-        choice = input("Enter the number of the request to approve (0 to exit): ")
-        if choice == '0':
-            return
-
-        try:
-            choice = int(choice)
-            if 1 <= choice <= len(self.leave_requests):
-                request = self.leave_requests[choice - 1]
-                request.approve()
-                print("Leave request approved.")
+        if choice == '1':
+            customer_name = input("Enter customer name: ")
+            loan_amount = float(input("Enter loan amount: $"))
+            interest_rate = float(input("Enter interest rate (%): "))
+            loan_term = int(input("Enter loan term (months): "))
+            loan = Loan(customer_name, loan_amount, interest_rate, loan_term)
+            loans.append(loan)
+            print("Loan created successfully.")
+        elif choice == '2':
+            if not loans:
+                print("No loans exist.")
+                continue
+            customer_name = input("Enter customer name: ")
+            loan = next((l for l in loans if l.customer_name == customer_name), None)
+            if loan:
+                payment_amount = float(input("Enter payment amount: $"))
+                loan.make_payment(payment_amount)
             else:
-                print("Invalid choice.")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-
-    def run(self):
-        while True:
-            print("\nLeave Application System")
-            print("1. Request Leave")
-            print("2. Process Leave Requests")
-            print("3. Exit")
-            choice = input("Enter your choice: ")
-
-            if choice == '1':
-                self.request_leave()
-            elif choice == '2':
-                self.process_leave_requests()
-            elif choice == '3':
-                print("Exiting the application.")
-                break
+                print("Loan not found for this customer.")
+        elif choice == '3':
+            if not loans:
+                print("No loans exist.")
+                continue
+            customer_name = input("Enter customer name: ")
+            loan = next((l for l in loans if l.customer_name == customer_name), None)
+            if loan:
+                print(loan.get_loan_summary())
             else:
-                print("Invalid choice. Please try again.")
+                print("Loan not found for this customer.")
+        elif choice == '4':
+            print("Exiting the application.")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
 
 if __name__ == "__main__":
-    leave_system = LeaveApplicationSystem()
-    leave_system.run()
+    main()
