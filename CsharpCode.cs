@@ -47,28 +47,7 @@ class AttendanceSystem
         }
     }
 
-    public void ViewAttendance(string employeeId, DateTime startDate, DateTime endDate)
-    {
-        Employee employee = employees.Find(emp => emp.EmployeeId == employeeId);
-
-        if (employee != null)
-        {
-            Console.WriteLine($"Attendance for {employee.EmployeeName} (ID: {employee.EmployeeId}) from {startDate.ToShortDateString()} to {endDate.ToShortDateString()}:");
-            foreach (var entry in employee.Attendance)
-            {
-                if (entry.Key >= startDate && entry.Key <= endDate)
-                {
-                    string status = entry.Value ? "Present" : "Absent";
-                    Console.WriteLine($"{entry.Key.ToShortDateString()}: {status}");
-                }
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Employee with ID {employeeId} not found.");
-        }
-    }
-}
+   
 
 class Program
 {
