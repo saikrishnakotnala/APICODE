@@ -7,6 +7,7 @@ class Loan:
         self.balance = loan_amount
         self.payments = []
 
+
     def make_payment(self, payment_amount):
         if payment_amount <= self.balance:
             self.balance -= payment_amount
