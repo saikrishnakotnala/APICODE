@@ -8,14 +8,6 @@ class Loan:
         self.payments = []
 
 
-    def make_payment(self, payment_amount):
-        if payment_amount <= self.balance:
-            self.balance -= payment_amount
-            self.payments.append(payment_amount)
-            print(f"Payment of ${payment_amount} made successfully.")
-        else:
-            print("Payment amount exceeds the outstanding balance.")
-
     def get_loan_summary(self):
         total_paid = sum(self.payments)
         return f"Customer: {self.customer_name}\n" \
